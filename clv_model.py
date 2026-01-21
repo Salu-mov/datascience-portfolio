@@ -5,12 +5,11 @@ import plotly.express as px
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 
-
 def run(lang='en'):
     content = {
         "title": {
-            "en": "Customer Segmentation Analysis",
-            "tr": "Müşteri Segmentasyon Uzayı"
+            "en": "Customer Segmentation Analysis (3D)",
+            "tr": "Müşteri Segmentasyon Uzayı (3D)"
         },
         "summary": {
             "en": "Project Overview & Business Value",
@@ -51,22 +50,18 @@ def run(lang='en'):
         np.random.seed(42)
         n_samples = 500
         data = pd.concat([
-            pd.DataFrame({'Recency': np.random.randint(1, 30, 100), 'Frequency': np.random.randint(20, 50, 100),
-                          'Monetary': np.random.normal(5000, 1000, 100)}),
-            pd.DataFrame({'Recency': np.random.randint(1, 30, 150), 'Frequency': np.random.randint(1, 5, 150),
-                          'Monetary': np.random.normal(500, 100, 150)}),
-            pd.DataFrame({'Recency': np.random.randint(100, 365, 150), 'Frequency': np.random.randint(1, 10, 150),
-                          'Monetary': np.random.normal(1000, 300, 150)}),
-            pd.DataFrame({'Recency': np.random.randint(30, 90, 100), 'Frequency': np.random.randint(5, 15, 100),
-                          'Monetary': np.random.normal(2000, 500, 100)})
+            pd.DataFrame({'Recency': np.random.randint(1, 30, 100), 'Frequency': np.random.randint(20, 50, 100), 'Monetary': np.random.normal(5000, 1000, 100)}),
+            pd.DataFrame({'Recency': np.random.randint(1, 30, 150), 'Frequency': np.random.randint(1, 5, 150), 'Monetary': np.random.normal(500, 100, 150)}),
+            pd.DataFrame({'Recency': np.random.randint(100, 365, 150), 'Frequency': np.random.randint(1, 10, 150), 'Monetary': np.random.normal(1000, 300, 150)}),
+            pd.DataFrame({'Recency': np.random.randint(30, 90, 100), 'Frequency': np.random.randint(5, 15, 100), 'Monetary': np.random.normal(2000, 500, 100)})
         ]).reset_index(drop=True)
         return data
 
     df = get_rfm_data()
-
+    
     scaler = StandardScaler()
     scaled_data = scaler.fit_transform(df)
-
+    
     kmeans = KMeans(n_clusters=4, random_state=42, n_init=10)
     df['Cluster'] = kmeans.fit_predict(scaled_data)
 
@@ -86,10 +81,22 @@ def run(lang='en'):
         color_discrete_map=color_map, opacity=0.6, size_max=10,
         labels=content["axis"][lang]
     )
+    
+    # --- LEGEND AYARI ---
+    fig.update_layout(
+        margin=dict(l=0, r=0, b=0, t=0),
+        legend=dict(
+            orientation="h",  
+            yanchor="bottom",
+            y=1.02,            
+            xanchor="right",
+            x=1               
+        )
+    )
+    # ---------------------------------------
 
-    fig.update_layout(margin=dict(l=0, r=0, b=0, t=0))
     st.plotly_chart(fig, use_container_width=True)
-
+    
     if lang == 'tr':
         st.success("🎯 Strateji: 'Segment 0' grubundaki müşteriler için özel sadakat programı başlatılması önerilir.")
     else:
