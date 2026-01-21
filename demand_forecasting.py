@@ -4,7 +4,7 @@ import numpy as np
 import plotly.graph_objects as go
 from xgboost import XGBRegressor
 from sklearn.metrics import mean_squared_error
-import datetime 
+import datetime
 
 def run(lang='en'):
     content = {
@@ -46,7 +46,7 @@ def run(lang='en'):
 
     st.subheader(content["title"][lang])
 
-    # --- TARİH OLUŞTURMA ---
+    # 1. VERİYİ ÖNBELLEĞE ALMA (Cache Data)
     @st.cache_data
     def generate_synthetic_data():
         start_date = datetime.date(2023, 1, 1)
@@ -66,7 +66,6 @@ def run(lang='en'):
     df['day_of_week'] = df['Date'].dt.dayofweek
     df_clean = df.dropna()
 
-    # Model Hazırlığı
     X = df_clean[['lag_7', 'rolling_mean', 'day_of_week']]
     y = df_clean['Sales']
 
@@ -74,13 +73,19 @@ def run(lang='en'):
     X_train, y_train = X.iloc[:train_size], y.iloc[:train_size]
     X_test, y_test = X.iloc[train_size:], y.iloc[train_size:]
 
-    model = XGBRegressor(n_estimators=100, learning_rate=0.1)
-    model.fit(X_train, y_train)
+    # 2. MODELİ ÖNBELLEĞE ALMA (Cache Resource)
+    
+    @st.cache_resource
+    def train_model(_X_train, _y_train):
+        model = XGBRegressor(n_estimators=100, learning_rate=0.1, n_jobs=1)
+        model.fit(_X_train, _y_train)
+        return model
+
+    model = train_model(X_train, y_train)
     
     predictions = model.predict(X_test)
     rmse = np.sqrt(mean_squared_error(y_test, predictions))
 
-    # Grafik
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=df_clean['Date'].iloc[train_size:], y=y_test, name="Actual" if lang == 'en' else "Gerçek"))
     fig.add_trace(go.Scatter(x=df_clean['Date'].iloc[train_size:], y=predictions, name="Forecast" if lang == 'en' else "Tahmin", line=dict(dash='dash')))
