@@ -4,8 +4,7 @@ import numpy as np
 import plotly.graph_objects as go
 from xgboost import XGBRegressor
 from sklearn.metrics import mean_squared_error
-from datetime import datetime
-
+import datetime 
 
 def run(lang='en'):
     content = {
@@ -47,9 +46,12 @@ def run(lang='en'):
 
     st.subheader(content["title"][lang])
 
+    # --- TARİH OLUŞTURMA ---
     @st.cache_data
     def generate_synthetic_data():
-        dates = pd.date_range(end=datetime.today(), periods=730)
+        start_date = datetime.date(2023, 1, 1)
+        dates = pd.date_range(start=start_date, periods=730, freq='D')
+        
         trend = np.linspace(0, 50, 730)
         seasonality = 20 * np.sin(np.linspace(0, 3 * np.pi, 730))
         noise = np.random.normal(0, 10, 730)
@@ -58,11 +60,13 @@ def run(lang='en'):
 
     df = generate_synthetic_data()
 
+    # Feature Engineering
     df['lag_7'] = df['Sales'].shift(7)
     df['rolling_mean'] = df['Sales'].shift(1).rolling(7).mean()
     df['day_of_week'] = df['Date'].dt.dayofweek
     df_clean = df.dropna()
 
+    # Model Hazırlığı
     X = df_clean[['lag_7', 'rolling_mean', 'day_of_week']]
     y = df_clean['Sales']
 
@@ -72,21 +76,19 @@ def run(lang='en'):
 
     model = XGBRegressor(n_estimators=100, learning_rate=0.1)
     model.fit(X_train, y_train)
-
+    
     predictions = model.predict(X_test)
     rmse = np.sqrt(mean_squared_error(y_test, predictions))
 
+    # Grafik
     fig = go.Figure()
-    fig.add_trace(
-        go.Scatter(x=df_clean['Date'].iloc[train_size:], y=y_test, name="Actual" if lang == 'en' else "Gerçek"))
-    fig.add_trace(
-        go.Scatter(x=df_clean['Date'].iloc[train_size:], y=predictions, name="Forecast" if lang == 'en' else "Tahmin",
-                   line=dict(dash='dash')))
+    fig.add_trace(go.Scatter(x=df_clean['Date'].iloc[train_size:], y=y_test, name="Actual" if lang == 'en' else "Gerçek"))
+    fig.add_trace(go.Scatter(x=df_clean['Date'].iloc[train_size:], y=predictions, name="Forecast" if lang == 'en' else "Tahmin", line=dict(dash='dash')))
     fig.update_layout(title=content["chart_title"][lang].format(rmse))
-
+    
     st.plotly_chart(fig, use_container_width=True)
 
     safety_stock = predictions.mean() * 0.2
     reorder_point = predictions.mean() * 5 + safety_stock
-
+    
     st.info(content["alert"][lang].format(reorder_point))
