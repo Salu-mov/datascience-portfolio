@@ -19,7 +19,7 @@ with st.sidebar:
     # 1. Dil Seçici En Üstte
     lang_choice = st.selectbox("Language / Dil", ["Türkçe", "English"])
     st.session_state.lang = 'tr' if lang_choice == "Türkçe" else 'en'
-    lang = st.session_state.lang  # Kısayol değişken
+    lang = st.session_state.lang
 
     # 2. Profil
     st.image("https://cdn-icons-png.flaticon.com/512/3135/3135715.png", width=120)
@@ -30,7 +30,7 @@ with st.sidebar:
 
     st.markdown("---")
 
-    # 3. Menü Seçenekleri (Çevirili)
+    # 3. Menü Seçenekleri
     menu_dict = {
         "tr": [
             "🏠 Ana Sayfa",
@@ -52,7 +52,7 @@ with st.sidebar:
     st.markdown("---")
     contact = "İletişim" if lang == 'tr' else "Contact"
 
-    # GÜNCELLENMİŞ İLETİŞİM KISMI (Laptop ikonu ve Gerçek Link)
+    # İLETİŞİM KISMI
     st.info(
         f"**{contact}:**\n\n🔗 [LinkedIn](https://www.linkedin.com/in/ulasaksac/)\n💻 [GitHub](https://github.com/Salu-mov)")
 
@@ -142,7 +142,7 @@ if selection in ["🏠 Ana Sayfa", "🏠 Home"]:
         st.markdown("### 💰 " + ("Emlak Değerleme" if lang == 'tr' else "Real Estate"))
         st.error(p_desc["real"][lang])
 
-# B) MODÜL ÇAĞRILARI (Dili içeri gönderiyoruz)
+# B) MODÜL ÇAĞRILARI
 elif selection in ["📈 Talep Tahmini (Yapay Zeka)", "📈 Demand Forecasting (AI)"]:
     demand_forecasting.run(lang)
 
@@ -150,4 +150,5 @@ elif selection in ["🛍️ Müşteri Analizi (CLV)", "🛍️ Customer Analysis
     clv_model.run(lang)
 
 elif selection in ["💰 Gayrimenkul Değerleme", "💰 Real Estate Valuation"]:
+
     pricing_model.run(lang)
