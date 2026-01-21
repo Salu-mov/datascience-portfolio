@@ -22,7 +22,6 @@ with st.sidebar:
     lang = st.session_state.lang
 
     # 2. Profil
-    st.image("https://cdn-icons-png.flaticon.com/512/3135/3135715.png", width=120)
     st.title("Ulaş Aksaç")
 
     role = "Data Scientist & Machine Learning & Data Analysis" if lang == 'tr' else "Data Scientist & Machine Learning & Data Analysis"
@@ -152,4 +151,5 @@ elif selection in ["🛍️ Müşteri Analizi (CLV)", "🛍️ Customer Analysis
 elif selection in ["💰 Gayrimenkul Değerleme", "💰 Real Estate Valuation"]:
 
     pricing_model.run(lang)
+
 
