@@ -25,7 +25,7 @@ with st.sidebar:
     st.image("https://cdn-icons-png.flaticon.com/512/3135/3135715.png", width=120)
     st.title("Ulaş Aksaç")
 
-    role = "Veri Bilimci & Machine Learning & Data Analysis" if lang == 'tr' else "Data Scientist & Machine Learning & Data Analysis"
+    role = "Data Scientist & Machine Learning & Data Analysis" if lang == 'tr' else "Data Scientist & Machine Learning & Data Analysis"
     st.caption(role)
 
     st.markdown("---")
@@ -152,3 +152,4 @@ elif selection in ["🛍️ Müşteri Analizi (CLV)", "🛍️ Customer Analysis
 elif selection in ["💰 Gayrimenkul Değerleme", "💰 Real Estate Valuation"]:
 
     pricing_model.run(lang)
+
