@@ -82,15 +82,15 @@ def run(lang='en'):
         labels=content["axis"][lang]
     )
     
-    # --- GÜNCELLENEN KISIM: LEGEND AYARI ---
+    # --- LEGEND AYARI ---
     fig.update_layout(
         margin=dict(l=0, r=0, b=0, t=0),
         legend=dict(
-            orientation="h",   # Yatay (Horizontal)
+            orientation="h",  
             yanchor="bottom",
-            y=1.02,            # Grafiğin hemen üstüne
+            y=1.02,           
             xanchor="right",
-            x=1                # Sağa hizalı
+            x=1               
         )
     )
     # ---------------------------------------
@@ -101,3 +101,4 @@ def run(lang='en'):
         st.success("🎯 Strateji: 'Segment 0' grubundaki müşteriler için özel sadakat programı başlatılması önerilir.")
     else:
         st.success("🎯 Strategy: A loyalty program is recommended for 'Segment 0' customers.")
+
