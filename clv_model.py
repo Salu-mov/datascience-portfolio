@@ -8,8 +8,8 @@ from sklearn.preprocessing import StandardScaler
 def run(lang='en'):
     content = {
         "title": {
-            "en": "Customer Segmentation Analysis (3D)",
-            "tr": "Müşteri Segmentasyon Uzayı (3D)"
+            "en": "Customer Segmentation Analysis",
+            "tr": "Müşteri Segmentasyon Uzayı"
         },
         "summary": {
             "en": "Project Overview & Business Value",
@@ -101,4 +101,5 @@ def run(lang='en'):
         st.success("🎯 Strateji: 'Segment 0' grubundaki müşteriler için özel sadakat programı başlatılması önerilir.")
     else:
         st.success("🎯 Strategy: A loyalty program is recommended for 'Segment 0' customers.")
+
 
