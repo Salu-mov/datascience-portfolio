@@ -7,35 +7,20 @@ from sklearn.metrics import mean_squared_error
 import datetime
 
 def run(lang='en'):
+    # --- DİL AYARLARI ---
     content = {
-        "title": {
-            "en": "AI-Powered Demand Forecasting",
-            "tr": "AI Tabanlı Talep Öngörü Sistemi"
-        },
-        "summary": {
-            "en": "Project Overview & Business Value",
-            "tr": "ℹ️ Proje Özeti ve İş Değeri"
-        },
+        "title": {"en": "AI-Powered Demand Forecasting", "tr": "AI Tabanlı Talep Öngörü Sistemi"},
+        "summary": {"en": "Project Overview", "tr": "ℹ️ Proje Özeti"},
         "metrics": {
-            "en": [
-                "**🎯 Goal:** Predict future sales to reduce inventory costs by 20-30%.",
-                "**🧠 Tech:** XGBoost Regressor, Lag Features & Time Series Analysis.",
-                "**💰 Impact:** Prevention of overstocking costs and optimized supply chain management."
-            ],
-            "tr": [
-                "**🎯 Amaç:** Satış tahminleri yaparak stok maliyetlerini %20-30 oranında düşürmek.",
-                "**🧠 Teknik:** XGBoost Regressor, Lag Features ve Zaman Serisi Analizi.",
-                "**💰 Kazanç:** Yanlış stoklama maliyetinin önlenmesi ve optimize tedarik yönetimi."
-            ]
+            "en": ["**🎯 Goal:** Predict future sales to optimize stock.", "**🧠 Tech:** XGBoost & Time Series.", "**💰 Impact:** Reduce inventory costs."],
+            "tr": ["**🎯 Amaç:** Gelecek satışları tahmin edip stoku optimize etmek.", "**🧠 Teknik:** XGBoost & Zaman Serisi.", "**💰 Kazanç:** Stok maliyetini düşürmek."]
         },
-        "chart_title": {
-            "en": "Forecast Performance (RMSE: {:.2f})",
-            "tr": "Tahmin Performansı (RMSE: {:.2f})"
-        },
-        "alert": {
-            "en": "💡 **System Suggestion:** Reorder required when stock level falls below **{:.0f}** units.",
-            "tr": "💡 **Sistem Önerisi:** Stok seviyesi **{:.0f}** adetin altına düştüğünde sipariş verilmelidir."
-        }
+        "chart_title": {"en": "Sales Forecast (Past vs Future)", "tr": "Satış Tahmini (Geçmiş ve Gelecek)"},
+        "alert": {"en": "💡 **Insight:** Reorder point is **{:.0f}** units.", "tr": "💡 **Analiz:** Sipariş noktası: **{:.0f}** adet."},
+        "upload_label": {"en": "📂 Upload your own CSV file", "tr": "📂 Kendi CSV dosyanızı yükleyin"},
+        "upload_help": {"en": "Columns must be: 'Date' and 'Sales'", "tr": "Sütun adları 'Date' ve 'Sales' olmalıdır"},
+        "error_cols": {"en": "❌ Error: CSV must contain 'Date' and 'Sales' columns.", "tr": "❌ Hata: CSV dosyası 'Date' ve 'Sales' sütunlarını içermelidir."},
+        "use_demo": {"en": "Using synthetic demo data...", "tr": "Sentetik demo verisi kullanılıyor..."}
     }
 
     with st.expander(content["summary"][lang], expanded=True):
@@ -46,54 +31,105 @@ def run(lang='en'):
 
     st.subheader(content["title"][lang])
 
-    # 1. VERİYİ ÖNBELLEĞE ALMA (Cache Data)
+    # --- DOSYA YÜKLEME ALANI ---
+    uploaded_file = st.file_uploader(content["upload_label"][lang], type=["csv"], help=content["upload_help"][lang])
+
+    # --- VERİ İŞLEME FONKSİYONU ---
+    def process_data(df_input):
+        # Tarih formatını düzelt
+        df_input['Date'] = pd.to_datetime(df_input['Date'], errors='coerce')
+        df_input = df_input.dropna(subset=['Date'])
+        df_input = df_input.sort_values('Date')
+        
+        # Feature Engineering
+        df_input['lag_7'] = df_input['Sales'].shift(7)
+        df_input['rolling_mean'] = df_input['Sales'].shift(1).rolling(7).mean()
+        df_input['day_of_week'] = df_input['Date'].dt.dayofweek
+        return df_input.dropna()
+
+    # --- SENTETİK VERİ ÜRETİCİ ---
     @st.cache_data
     def generate_synthetic_data():
         start_date = datetime.date(2023, 1, 1)
         dates = pd.date_range(start=start_date, periods=730, freq='D')
-        
         trend = np.linspace(0, 50, 730)
         seasonality = 20 * np.sin(np.linspace(0, 3 * np.pi, 730))
         noise = np.random.normal(0, 10, 730)
         sales = 100 + trend + seasonality + noise
         return pd.DataFrame({"Date": dates, "Sales": np.maximum(sales, 0)})
 
-    df = generate_synthetic_data()
-
-    # Feature Engineering
-    df['lag_7'] = df['Sales'].shift(7)
-    df['rolling_mean'] = df['Sales'].shift(1).rolling(7).mean()
-    df['day_of_week'] = df['Date'].dt.dayofweek
-    df_clean = df.dropna()
-
-    X = df_clean[['lag_7', 'rolling_mean', 'day_of_week']]
-    y = df_clean['Sales']
-
-    train_size = int(len(X) * 0.9)
-    X_train, y_train = X.iloc[:train_size], y.iloc[:train_size]
-    X_test, y_test = X.iloc[train_size:], y.iloc[train_size:]
-
-    # 2. MODELİ ÖNBELLEĞE ALMA (Cache Resource)
+    # --- AKIŞ KONTROLÜ (YÜKLENDİ Mİ?) ---
+    df = None
     
-    @st.cache_resource
-    def train_model(_X_train, _y_train):
-        model = XGBRegressor(n_estimators=100, learning_rate=0.1, n_jobs=1)
-        model.fit(_X_train, _y_train)
-        return model
+    if uploaded_file is not None:
+        try:
+            df_uploaded = pd.read_csv(uploaded_file)
+            # Sütun kontrolü
+            if 'Date' in df_uploaded.columns and 'Sales' in df_uploaded.columns:
+                df = process_data(df_uploaded)
+                st.success("✅ Veri başarıyla yüklendi!" if lang == 'tr' else "✅ Data uploaded successfully!")
+            else:
+                st.error(content["error_cols"][lang])
+        except Exception as e:
+            st.error(f"Hata/Error: {e}")
 
-    model = train_model(X_train, y_train)
+    # Eğer dosya yoksa veya hatalıysa Demo verisi kullan
+    if df is None:
+        if uploaded_file is None:
+            st.info(content["use_demo"][lang])
+        df_raw = generate_synthetic_data()
+        df = process_data(df_raw)
+
+    # --- MODEL EĞİTİMİ ---
+    X = df[['lag_7', 'rolling_mean', 'day_of_week']]
+    y = df['Sales']
+
+    
+    split_point = int(len(X) * 0.9)
+    X_train, y_train = X.iloc[:split_point], y.iloc[:split_point]
+    X_test, y_test = X.iloc[split_point:], y.iloc[split_point:]
+
+    
+    model = XGBRegressor(n_estimators=100, learning_rate=0.05)
+    model.fit(X_train, y_train)
     
     predictions = model.predict(X_test)
     rmse = np.sqrt(mean_squared_error(y_test, predictions))
 
+    # --- GRAFİK KISMI ---
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=df_clean['Date'].iloc[train_size:], y=y_test, name="Actual" if lang == 'en' else "Gerçek"))
-    fig.add_trace(go.Scatter(x=df_clean['Date'].iloc[train_size:], y=predictions, name="Forecast" if lang == 'en' else "Tahmin", line=dict(dash='dash')))
-    fig.update_layout(title=content["chart_title"][lang].format(rmse))
-    
+
+    # 1. Geçmiş Veri
+    fig.add_trace(go.Scatter(
+        x=df['Date'].iloc[:split_point], 
+        y=y_train, 
+        name="Geçmiş/History",
+        line=dict(color='gray', width=1),
+        opacity=0.6
+    ))
+
+    # 2. Gerçek Değerler
+    fig.add_trace(go.Scatter(
+        x=df['Date'].iloc[split_point:], 
+        y=y_test, 
+        name="Gerçek/Actual",
+        line=dict(color='#636EFA', width=2)
+    ))
+
+    # 3. Tahmin
+    fig.add_trace(go.Scatter(
+        x=df['Date'].iloc[split_point:], 
+        y=predictions, 
+        name="AI Tahmini/Forecast",
+        line=dict(color='#EF553B', width=3, dash='dot')
+    ))
+
+    # Ayırıcı Çizgi
+    split_date = df['Date'].iloc[split_point]
+    fig.add_vline(x=split_date, line_width=2, line_dash="dash", line_color="green")
+
+    fig.update_layout(title=content["chart_title"][lang].format(rmse), template="plotly_white", hovermode="x unified")
     st.plotly_chart(fig, use_container_width=True)
 
-    safety_stock = predictions.mean() * 0.2
-    reorder_point = predictions.mean() * 5 + safety_stock
-    
+    reorder_point = predictions.mean()
     st.info(content["alert"][lang].format(reorder_point))
