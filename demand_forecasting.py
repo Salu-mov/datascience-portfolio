@@ -36,7 +36,6 @@ def run(lang='en'):
 
     # --- VERİ İŞLEME FONKSİYONU ---
     def process_data(df_input):
-        # Tarih formatını düzelt
         df_input['Date'] = pd.to_datetime(df_input['Date'], errors='coerce')
         df_input = df_input.dropna(subset=['Date'])
         df_input = df_input.sort_values('Date')
@@ -47,7 +46,7 @@ def run(lang='en'):
         df_input['day_of_week'] = df_input['Date'].dt.dayofweek
         return df_input.dropna()
 
-    # --- SENTETİK VERİ ÜRETİCİ (YEDEK PLAN) ---
+    # --- SENTETİK VERİ ÜRETİCİ ---
     @st.cache_data
     def generate_synthetic_data():
         start_date = datetime.date(2023, 1, 1)
@@ -58,13 +57,12 @@ def run(lang='en'):
         sales = 100 + trend + seasonality + noise
         return pd.DataFrame({"Date": dates, "Sales": np.maximum(sales, 0)})
 
-    # --- AKIŞ KONTROLÜ (YÜKLENDİ Mİ?) ---
+    # --- AKIŞ KONTROLÜ ---
     df = None
     
     if uploaded_file is not None:
         try:
             df_uploaded = pd.read_csv(uploaded_file)
-            # Sütun kontrolü
             if 'Date' in df_uploaded.columns and 'Sales' in df_uploaded.columns:
                 df = process_data(df_uploaded)
                 st.success("✅ Veri başarıyla yüklendi!" if lang == 'tr' else "✅ Data uploaded successfully!")
@@ -73,7 +71,6 @@ def run(lang='en'):
         except Exception as e:
             st.error(f"Hata/Error: {e}")
 
-    # Eğer dosya yoksa veya hatalıysa Demo verisi kullan
     if df is None:
         if uploaded_file is None:
             st.info(content["use_demo"][lang])
@@ -84,12 +81,12 @@ def run(lang='en'):
     X = df[['lag_7', 'rolling_mean', 'day_of_week']]
     y = df['Sales']
 
-    # Son %10'luk kısmı test (gelecek) olarak ayır
-    split_point = int(len(X) * 0.9)
+    
+    split_point = int(len(X) * 0.8)
+    
     X_train, y_train = X.iloc[:split_point], y.iloc[:split_point]
     X_test, y_test = X.iloc[split_point:], y.iloc[split_point:]
 
-    # Model Eğitimi (Cache Resource ile hızlandırılmış)
     model = XGBRegressor(n_estimators=100, learning_rate=0.05)
     model.fit(X_train, y_train)
     
@@ -108,7 +105,7 @@ def run(lang='en'):
         opacity=0.6
     ))
 
-    # 2. Gerçek Değerler
+    # 2. Gerçek Değerler (Test seti)
     fig.add_trace(go.Scatter(
         x=df['Date'].iloc[split_point:], 
         y=y_test, 
@@ -124,7 +121,6 @@ def run(lang='en'):
         line=dict(color='#EF553B', width=3, dash='dot')
     ))
 
-    # Ayırıcı Çizgi
     split_date = df['Date'].iloc[split_point]
     fig.add_vline(x=split_date, line_width=2, line_dash="dash", line_color="green")
 
