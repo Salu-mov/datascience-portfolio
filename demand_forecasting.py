@@ -47,7 +47,7 @@ def run(lang='en'):
         df_input['day_of_week'] = df_input['Date'].dt.dayofweek
         return df_input.dropna()
 
-    # --- SENTETİK VERİ ÜRETİCİ ---
+    # --- SENTETİK VERİ ÜRETİCİ (YEDEK PLAN) ---
     @st.cache_data
     def generate_synthetic_data():
         start_date = datetime.date(2023, 1, 1)
@@ -84,12 +84,12 @@ def run(lang='en'):
     X = df[['lag_7', 'rolling_mean', 'day_of_week']]
     y = df['Sales']
 
-    
+    # Son %10'luk kısmı test (gelecek) olarak ayır
     split_point = int(len(X) * 0.9)
     X_train, y_train = X.iloc[:split_point], y.iloc[:split_point]
     X_test, y_test = X.iloc[split_point:], y.iloc[split_point:]
 
-    
+    # Model Eğitimi (Cache Resource ile hızlandırılmış)
     model = XGBRegressor(n_estimators=100, learning_rate=0.05)
     model.fit(X_train, y_train)
     
