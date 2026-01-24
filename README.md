@@ -112,7 +112,7 @@ demand-forecasting/
 ## 🎮 Try It Yourself
 
 ### Option 1: Use the Live Demo
-👉 [Click here to access the interactive dashboard]([https://your-app-url.streamlit.app](https://datascience-portfolio-saluaksac.streamlit.app/))
+👉 [Click here to access the interactive dashboard](https://datascience-portfolio-saluaksac.streamlit.app/)
 
 ### Option 2: Run Locally
 
