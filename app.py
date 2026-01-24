@@ -66,8 +66,8 @@ if selection in ["🏠 Ana Sayfa", "🏠 Home"]:
     # Metin Sözlüğü
     content = {
         "title": {
-            "tr": "🚀 Veri Bilimi ve Karar Destek Sistemleri",
-            "en": "🚀 Data Science & Decision Support Systems"
+            "tr": "Veri Bilimi ve Karar Destek Sistemleri",
+            "en": "Data Science & Decision Support Systems"
         },
         "intro": {
             "tr": """
@@ -425,3 +425,4 @@ elif selection in ["💰 Gayrimenkul Değerleme", "💰 Real Estate Valuation"]:
 
 elif selection in ["🧪 A/B Test Analizi", "🧪 A/B Test Analyzer"]:
     ab_test_simulator.run(lang)
+
