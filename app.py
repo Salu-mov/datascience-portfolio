@@ -2,7 +2,7 @@ import streamlit as st
 import demand_forecasting
 import clv_model
 import pricing_model
-import ab_test_simulator  # YENİ PROJE
+import ab_test_simulator
 
 # Sayfa Ayarları
 st.set_page_config(
@@ -38,6 +38,15 @@ with st.sidebar:
             "🛍️ Müşteri Analizi (CLV)",
             "💰 Gayrimenkul Değerleme",
             "🧪 A/B Test Analizi"  # YENİ
+        ],
+        "en": [
+            "🏠 Home",
+            "📈 Demand Forecasting (AI)",
+            "🛍️ Customer Analysis (CLV)",
+            "💰 Real Estate Valuation",
+            "🧪 A/B Test Analyzer"  # YENİ
+        ]
+    }# YENİ
         ],
         "en": [
             "🏠 Home",
@@ -122,7 +131,7 @@ if selection in ["🏠 Ana Sayfa", "🏠 Home"]:
     st.subheader(content["gallery"][lang])
     st.caption(content["info"][lang])
 
-    # Alt kısımdaki Proje Özet Kartları
+    # Alt kısımdaki Proje Özet Kartları (4 proje)
     col_p1, col_p2, col_p3, col_p4 = st.columns(4)
 
     p_desc = {
