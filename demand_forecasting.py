@@ -59,7 +59,7 @@ def run(lang='en'):
         c2.markdown(content["metrics"][lang][1])
         c3.markdown(content["metrics"][lang][2])
 
-    # NASIL ÇALIŞIR
+    # NASIL ÇALIŞIR BÖLÜMÜ
     with st.expander(content["how_it_works"][lang], expanded=False):
         st.markdown(content["workflow"][lang])
         
