@@ -5,7 +5,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, r2_score
-import shap
 
 def run(lang='en'):
     content = {
@@ -232,6 +231,26 @@ def run(lang='en'):
     
     st.plotly_chart(fig_importance, use_container_width=True)
 
-    # PDF EXPORT BUTONU
-    if st.button("📄 " + ("Download Report (PDF)" if lang == 'en' else "Rapor İndir (PDF)")):
-        st.info("PDF export functionality will be implemented with ReportLab library" if lang == 'en' else "PDF dışa aktarma ReportLab kütüphanesi ile eklenecek")
+    # COMPARISON TABLE
+    st.divider()
+    st.markdown("### " + ("📋 District Price Comparison" if lang == 'en' else "📋 İlçe Fiyat Karşılaştırması"))
+    
+    comparison_data = []
+    for dist_name in districts.keys():
+        test_input = input_row.copy()
+        test_input.loc[:] = 0
+        test_input['Size'] = s_size
+        test_input['Age'] = s_age
+        test_input['Rooms'] = s_rooms
+        if f'District_{dist_name}' in test_input.columns:
+            test_input[f'District_{dist_name}'] = 1
+        
+        pred_price = model.predict(test_input)[0]
+        comparison_data.append({
+            'District' if lang == 'en' else 'İlçe': dist_name,
+            'Estimated Price (₺)' if lang == 'en' else 'Tahmini Fiyat (₺)': f"₺{pred_price:,.0f}",
+            'Unit Price (₺/m²)' if lang == 'en' else 'Birim Fiyat (₺/m²)': f"₺{pred_price/s_size:,.0f}"
+        })
+    
+    comparison_df = pd.DataFrame(comparison_data)
+    st.dataframe(comparison_df, use_container_width=True, hide_index=True)
