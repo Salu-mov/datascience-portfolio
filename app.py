@@ -25,7 +25,7 @@ with st.sidebar:
     # 2. Profil
     st.title("Ulaş Aksaç")
 
-    role = "Data Scientist & Machine Learning & Data Analysis" if lang == 'tr' else "Data Scientist & Machine Learning & Data Analysis"
+    role = "Data Scientist & Machine Learning & Data Analysis"
     st.caption(role)
 
     st.markdown("---")
@@ -37,23 +37,14 @@ with st.sidebar:
             "📈 Talep Tahmini (Yapay Zeka)",
             "🛍️ Müşteri Analizi (CLV)",
             "💰 Gayrimenkul Değerleme",
-            "🧪 A/B Test Analizi"  # YENİ
+            "🧪 A/B Test Analizi"
         ],
         "en": [
             "🏠 Home",
             "📈 Demand Forecasting (AI)",
             "🛍️ Customer Analysis (CLV)",
             "💰 Real Estate Valuation",
-            "🧪 A/B Test Analyzer"  # YENİ
-        ]
-    }# YENİ
-        ],
-        "en": [
-            "🏠 Home",
-            "📈 Demand Forecasting (AI)",
-            "🛍️ Customer Analysis (CLV)",
-            "💰 Real Estate Valuation",
-            "🧪 A/B Test Analyzer"  # YENİ
+            "🧪 A/B Test Analyzer"
         ]
     }
 
