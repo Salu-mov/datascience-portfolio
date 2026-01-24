@@ -37,7 +37,7 @@ This portfolio showcases **4 production-ready** ML applications built with:
 ### 📈 Demand Forecasting
 **₺5.1M** saved annually  
 *Retail chain case study*  
-[→ View Project](#1-ai-powered-demand-forecasting)
+
 
 </td>
 <td width="33%" align="center">
@@ -45,7 +45,7 @@ This portfolio showcases **4 production-ready** ML applications built with:
 ### 🛍️ Customer Segmentation
 **₺3.8M** revenue increase  
 *E-commerce platform*  
-[→ View Project](#2-customer-segmentation-engine)
+
 
 </td>
 <td width="33%" align="center">
@@ -53,7 +53,7 @@ This portfolio showcases **4 production-ready** ML applications built with:
 ### 💰 Real Estate Pricing
 **₺31M** first-year impact  
 *Property valuation firm*  
-[→ View Project](#3-real-estate-valuation-engine)
+
 
 </td>
 </tr>
