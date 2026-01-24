@@ -2,6 +2,7 @@ import streamlit as st
 import demand_forecasting
 import clv_model
 import pricing_model
+import ab_test_simulator  # YENİ PROJE
 
 # Sayfa Ayarları
 st.set_page_config(
@@ -35,13 +36,15 @@ with st.sidebar:
             "🏠 Ana Sayfa",
             "📈 Talep Tahmini (Yapay Zeka)",
             "🛍️ Müşteri Analizi (CLV)",
-            "💰 Gayrimenkul Değerleme"
+            "💰 Gayrimenkul Değerleme",
+            "🧪 A/B Test Analizi"  # YENİ
         ],
         "en": [
             "🏠 Home",
             "📈 Demand Forecasting (AI)",
             "🛍️ Customer Analysis (CLV)",
-            "💰 Real Estate Valuation"
+            "💰 Real Estate Valuation",
+            "🧪 A/B Test Analyzer"  # YENİ
         ]
     }
 
@@ -102,7 +105,7 @@ if selection in ["🏠 Ana Sayfa", "🏠 Home"]:
     st.markdown(content["intro"][lang])
     st.divider()
 
-    # O sevdiğin 3 Kolonlu Yapı
+    # 3 Kolonlu Yapı
     c1, c2, c3 = st.columns(3)
     with c1:
         st.subheader(content["tech_title"][lang])
@@ -120,7 +123,7 @@ if selection in ["🏠 Ana Sayfa", "🏠 Home"]:
     st.caption(content["info"][lang])
 
     # Alt kısımdaki Proje Özet Kartları
-    col_p1, col_p2, col_p3 = st.columns(3)
+    col_p1, col_p2, col_p3, col_p4 = st.columns(4)
 
     p_desc = {
         "demand": {"tr": "Gelecek satışları tahmin eden ve stok maliyetlerini optimize eden AI sistemi.",
@@ -128,7 +131,9 @@ if selection in ["🏠 Ana Sayfa", "🏠 Home"]:
         "clv": {"tr": "Müşterileri harcama alışkanlıklarına göre segmentlere ayıran pazarlama motoru.",
                 "en": "Marketing engine segmenting customers based on spending habits."},
         "real": {"tr": "İstanbul emlak verileriyle eğitilmiş saniyelik fiyat tahmin modeli.",
-                 "en": "Instant price prediction model trained on Istanbul real estate data."}
+                 "en": "Instant price prediction model trained on Istanbul real estate data."},
+        "ab": {"tr": "Kampanya etkisini istatistiksel olarak doğrulayan hipotez test aracı.",
+               "en": "Hypothesis testing tool to validate campaign effectiveness statistically."}
     }
 
     with col_p1:
@@ -140,6 +145,9 @@ if selection in ["🏠 Ana Sayfa", "🏠 Home"]:
     with col_p3:
         st.markdown("### 💰 " + ("Emlak Değerleme" if lang == 'tr' else "Real Estate"))
         st.error(p_desc["real"][lang])
+    with col_p4:
+        st.markdown("### 🧪 " + ("A/B Test" if lang == 'tr' else "A/B Testing"))
+        st.success(p_desc["ab"][lang])
 
 # B) MODÜL ÇAĞRILARI
 elif selection in ["📈 Talep Tahmini (Yapay Zeka)", "📈 Demand Forecasting (AI)"]:
@@ -149,7 +157,7 @@ elif selection in ["🛍️ Müşteri Analizi (CLV)", "🛍️ Customer Analysis
     clv_model.run(lang)
 
 elif selection in ["💰 Gayrimenkul Değerleme", "💰 Real Estate Valuation"]:
-
     pricing_model.run(lang)
 
-
+elif selection in ["🧪 A/B Test Analizi", "🧪 A/B Test Analyzer"]:
+    ab_test_simulator.run(lang)
